@@ -6,7 +6,7 @@
 /*   By: rnoriko <rnoriko@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 13:31:20 by rnoriko           #+#    #+#             */
-/*   Updated: 2021/05/28 14:29:24 by rnoriko          ###   ########.fr       */
+/*   Updated: 2021/05/28 15:06:51 by rnoriko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ t_gnl_bonus	*ft_create_node(int fd)
 	if (!new_node)
 		return (NULL);
 	new_node -> fd = fd;
-	new_node -> save_buffer = NULL;
+	new_node -> save_buffer = ft_strjoin("", "");
 	new_node -> next = NULL;
 	return (new_node);
 }

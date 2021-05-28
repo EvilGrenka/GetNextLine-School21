@@ -6,7 +6,7 @@
 /*   By: rnoriko <rnoriko@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 13:33:36 by rnoriko           #+#    #+#             */
-/*   Updated: 2021/05/28 14:31:56 by rnoriko          ###   ########.fr       */
+/*   Updated: 2021/05/28 15:01:44 by rnoriko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,30 @@ static int	ft_del_node(t_gnl_bonus **head, t_gnl_bonus *current_node,
 		free(tmp->save_buffer);
 	free(tmp);
 	return (readed_bytes);
+}
+
+static t_gnl_bonus	*ft_get_or_create_node(int fd, t_gnl_bonus **head)
+{
+	t_gnl_bonus	*tmp;
+
+	if (!(*head))
+	{
+		*head = ft_create_node(fd);
+		if (!(*head))
+			return (NULL);
+	}
+	tmp = *head;
+	while (tmp -> fd != fd)
+	{
+		if (!tmp -> next)
+		{
+			tmp -> next = ft_create_node(fd);
+			if (!tmp->next)
+				return (NULL);
+		}
+		tmp = tmp -> next;
+	}
+	return (tmp);
 }
 
 static int	ft_save_buffer_node(int fd, char *buffer, t_gnl_bonus **head,
@@ -87,30 +111,6 @@ static char	*ft_get_line_and_reminder(char **line, char *save_buffer,
 		save_buffer = NULL;
 	}
 	return (save_buffer);
-}
-
-static t_gnl_bonus	*ft_get_or_create_node(int fd, t_gnl_bonus **head)
-{
-	t_gnl_bonus	*tmp;
-
-	if (!(*head))
-	{
-		*head = ft_create_node(fd);
-		if (!(*head))
-			return (NULL);
-	}
-	tmp = *head;
-	while (tmp -> fd != fd)
-	{
-		if (!tmp -> next)
-		{
-			tmp -> next = ft_create_node(fd);
-			if (!tmp->next)
-				return (NULL);
-		}
-		tmp = tmp -> next;
-	}
-	return (tmp);
 }
 
 int	get_next_line(int fd, char **line)
