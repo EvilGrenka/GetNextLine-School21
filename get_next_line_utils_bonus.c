@@ -6,7 +6,7 @@
 /*   By: rnoriko <rnoriko@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 13:31:20 by rnoriko           #+#    #+#             */
-/*   Updated: 2021/05/27 20:28:57 by rnoriko          ###   ########.fr       */
+/*   Updated: 2021/05/28 14:29:24 by rnoriko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,22 +38,6 @@ char	*ft_strchr(const char *s, int c)
 	return (NULL);
 }
 
-char	*ft_strdup(const char *s1)
-{
-	char	*str_heap;
-	char	*heap_temp;
-
-	str_heap = (char *) malloc(sizeof(char) * (ft_strlen(s1) + 1));
-	if (str_heap)
-	{
-		heap_temp = str_heap;
-		while (*s1)
-			*heap_temp++ = *s1++;
-		*heap_temp = '\0';
-	}
-	return (str_heap);
-}
-
 char	*ft_strjoin(char const *s1, char const *s2)
 {
 	char	*str;
@@ -82,7 +66,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 	char			*substr;
 
 	if (!s || len <= 0 || start >= ft_strlen(s))
-		return (ft_strdup(""));
+		return (ft_strjoin("", ""));
 	else
 	{
 		if (ft_strlen(s + start) < len)
@@ -96,4 +80,17 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		substr[i] = '\0';
 		return (substr);
 	}
+}
+
+t_gnl_bonus	*ft_create_node(int fd)
+{
+	t_gnl_bonus	*new_node;
+
+	new_node = (t_gnl_bonus *) malloc(sizeof(t_gnl_bonus));
+	if (!new_node)
+		return (NULL);
+	new_node -> fd = fd;
+	new_node -> save_buffer = NULL;
+	new_node -> next = NULL;
+	return (new_node);
 }
