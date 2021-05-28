@@ -6,35 +6,33 @@
 /*   By: rnoriko <rnoriko@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/27 13:33:36 by rnoriko           #+#    #+#             */
-/*   Updated: 2021/05/28 15:01:44 by rnoriko          ###   ########.fr       */
+/*   Updated: 2021/05/28 19:35:22 by rnoriko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-static int	ft_del_node(t_gnl_bonus **head, t_gnl_bonus *current_node,
-	int readed_bytes)
+static void	ft_del_node(t_gnl_bonus **head, t_gnl_bonus *current)
 {
 	t_gnl_bonus	*tmp;
 
 	if (!head || !(*head))
-		return (readed_bytes);
+		return ;
 	tmp = *head;
-	if (tmp == current_node && !tmp->next)
+	if (tmp == current && !tmp->next)
 		*head = NULL;
-	else if (tmp == current_node)
+	else if (tmp == current)
 		*head = (*head)->next;
 	else
 	{
-		while (tmp->next != current_node)
+		while (tmp->next != current)
 			tmp = tmp->next;
-		tmp->next = current_node->next;
-		tmp = current_node;
+		tmp->next = current->next;
+		tmp = current;
 	}	
-	if (tmp->save_buffer)
-		free(tmp->save_buffer);
+	if (tmp->save)
+		free(tmp->save);
 	free(tmp);
-	return (readed_bytes);
 }
 
 static t_gnl_bonus	*ft_get_or_create_node(int fd, t_gnl_bonus **head)
@@ -62,7 +60,7 @@ static t_gnl_bonus	*ft_get_or_create_node(int fd, t_gnl_bonus **head)
 }
 
 static int	ft_save_buffer_node(int fd, char *buffer, t_gnl_bonus **head,
-	t_gnl_bonus*current_node)
+	t_gnl_bonus *current)
 {
 	char		*control_leaks;
 	int			readed_bytes;
@@ -71,17 +69,19 @@ static int	ft_save_buffer_node(int fd, char *buffer, t_gnl_bonus **head,
 	while (readed_bytes)
 	{
 		if (readed_bytes == -1)
-			return (ft_del_node(head, current_node, readed_bytes));
-		buffer[readed_bytes] = '\0';
-		if (current_node -> save_buffer)
 		{
-			control_leaks = current_node -> save_buffer;
-			current_node -> save_buffer
-				= ft_strjoin(current_node -> save_buffer, buffer);
+			ft_del_node(head, current);
+			return (readed_bytes);
+		}
+		buffer[readed_bytes] = '\0';
+		if (current -> save)
+		{
+			control_leaks = current -> save;
+			current -> save = ft_strjoin(current -> save, buffer);
 			free(control_leaks);
 		}
 		else
-			current_node -> save_buffer = ft_strjoin(buffer, "");
+			current -> save = ft_strjoin(buffer, "");
 		if (ft_strchr(buffer, '\n'))
 			break ;
 		readed_bytes = read(fd, buffer, BUFFER_SIZE);
@@ -89,52 +89,54 @@ static int	ft_save_buffer_node(int fd, char *buffer, t_gnl_bonus **head,
 	return (readed_bytes);
 }
 
-static char	*ft_get_line_and_reminder(char **line, char *save_buffer,
+static char	*ft_get_line_and_reminder(char **line, char *save,
 	int readed_bytes)
 {
 	char	*control_leaks;
 	size_t	i;
 
 	i = 0;
-	while (save_buffer[i] != '\n' && save_buffer[i])
+	while (save[i] != '\n' && save[i])
 		i++;
-	if (i < ft_strlen(save_buffer))
+	if (i < ft_strlen(save))
 	{
-		*line = ft_substr(save_buffer, 0, i);
-		control_leaks = save_buffer;
-		save_buffer = ft_substr(save_buffer, i + 1, ft_strlen(save_buffer));
+		*line = ft_substr(save, 0, i);
+		control_leaks = save;
+		save = ft_substr(save, i + 1, ft_strlen(save));
 		free(control_leaks);
 	}
 	else if (!readed_bytes)
 	{
-		*line = save_buffer;
-		save_buffer = NULL;
+		*line = save;
+		save = NULL;
 	}
-	return (save_buffer);
+	return (save);
 }
 
 int	get_next_line(int fd, char **line)
 {
 	static t_gnl_bonus	*head;
-	t_gnl_bonus			*current_node;
+	t_gnl_bonus			*current;
 	char				buffer[BUFFER_SIZE + 1];
 	int					readed_bytes;
 
 	if (!line || BUFFER_SIZE <= 0)
 		return (-1);
-	current_node = ft_get_or_create_node(fd, &head);
-	if (!current_node)
+	current = ft_get_or_create_node(fd, &head);
+	if (!current)
 		return (-1);
-	readed_bytes = ft_save_buffer_node(current_node -> fd,
-			buffer, &head, current_node);
+	readed_bytes = ft_save_buffer_node(current -> fd, buffer, &head, current);
 	if (readed_bytes == -1)
 		return (readed_bytes);
-	if (!readed_bytes && !current_node->save_buffer)
+	if (!readed_bytes && !current->save)
 		*line = ft_strjoin("", "");
 	else
-		current_node -> save_buffer = ft_get_line_and_reminder
-			(line, current_node -> save_buffer, readed_bytes);
-	if (!readed_bytes && !current_node->save_buffer)
-		return (ft_del_node(&head, current_node, readed_bytes));
+		current -> save = ft_get_line_and_reminder(line, current -> save,
+				readed_bytes);
+	if (!readed_bytes && !current->save)
+	{
+		ft_del_node(&head, current);
+		return (readed_bytes);
+	}
 	return (1);
 }

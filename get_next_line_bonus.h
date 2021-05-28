@@ -6,7 +6,7 @@
 /*   By: rnoriko <rnoriko@student.21-school.ru>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/05/28 12:12:18 by rnoriko           #+#    #+#             */
-/*   Updated: 2021/05/28 14:32:37 by rnoriko          ###   ########.fr       */
+/*   Updated: 2021/05/28 19:27:06 by rnoriko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 typedef struct s_gnl_bonus
 {
 	int					fd;
-	char				*save_buffer;
+	char				*save;
 	struct s_gnl_bonus	*next;
 }				t_gnl_bonus;
 
